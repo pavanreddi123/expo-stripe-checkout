@@ -67,7 +67,7 @@ class StripeCheckout extends Component {
             </script>`, baseUrl: ''}}
         onMessage={event => event.nativeEvent.data === 'WINDOW_CLOSED' ? onClose() : onPaymentSuccess(event.nativeEvent.data)}
         style={[{ flex: 1 }, style]}
-		scalesPageToFit={Platform.OS === 'android'}
+	scalesPageToFit={false}
       />
     );
   }
