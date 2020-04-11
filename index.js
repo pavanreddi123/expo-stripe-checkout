@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { WebView, Platform, View, ViewPropTypes  } from 'react-native';
+import { WebView} from 'react-native-webview';
 import { PropTypes } from 'prop-types';
 
 class StripeCheckout extends Component {
@@ -18,22 +18,23 @@ class StripeCheckout extends Component {
       onClose
     } = this.props;
 
-    const jsCode = `(function() {
+    const jsCode =  `(function() {
                     var originalPostMessage = window.postMessage;
-
                     var patchedPostMessage = function(message, targetOrigin, transfer) {
                       originalPostMessage(message, targetOrigin, transfer);
                     };
-
                     patchedPostMessage.toString = function() {
                       return String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage');
                     };
-
                     window.postMessage = patchedPostMessage;
+
+                    window.postMessage = function(data) {
+                      window.ReactNativeWebView.postMessage(data);
+                    };
                   })();`;
     return (
       <WebView
-		originWhitelist={['*']}
+	    originWhitelist={['*']}
         javaScriptEnabled={true}
         scrollEnabled={false}
         bounces={false}
@@ -66,7 +67,7 @@ class StripeCheckout extends Component {
             </script>`, baseUrl: ''}}
         onMessage={event => event.nativeEvent.data === 'WINDOW_CLOSED' ? onClose() : onPaymentSuccess(event.nativeEvent.data)}
         style={[{ flex: 1 }, style]}
-        scalesPageToFit={Platform.OS === 'android'}
+		scalesPageToFit={Platform.OS === 'android'}
       />
     );
   }
@@ -83,7 +84,7 @@ StripeCheckout.propTypes = {
   onClose: PropTypes.func.isRequired,
   currency: PropTypes.string,
   prepopulatedEmail: PropTypes.string,
-  style: ViewPropTypes.style
+  
 };
 
 StripeCheckout.defaultProps = {
